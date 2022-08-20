@@ -294,7 +294,10 @@ static Error ProcessItem(FSSpecPtr myFSSPtr)
                 DisposeHandle(abFileSpec.abFilePath2BPStrH);
 
                 /* Move the offset to the next byte boundary */
-                headerOffset += kABFileHeaderBoundary - (headerOffset % kABFileHeaderBoundary);
+                if (headerOffset % kABFileHeaderBoundary)
+                {
+                    headerOffset += kABFileHeaderBoundary - (headerOffset % kABFileHeaderBoundary);
+                }
             }
         }
     }
@@ -311,7 +314,7 @@ static Error ProcessItem(FSSpecPtr myFSSPtr)
 }
 
 /*
-	This routine is called when the user chooses "Select File…" from the
+	This routine is called when the user chooses "Select File." from the
 	File Menu.
 	
 	Currently it simply calls the new StandardGetFile routine to have the

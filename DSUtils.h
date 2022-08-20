@@ -86,6 +86,7 @@ void _SendDocsToSelf (AEDescList *aliasList);
 void SendODOCToSelf (FSSpec *theFileSpec);
 void SendQuitToSelf (void);
 
+void mySafeFilename(Str255 s);
 Error myCreateError(OSErr err, char *file, long line);
 unsigned char myValToBaseXChar(unsigned short v);
 void myCopyPStr(const Str255 s,Str255 t);

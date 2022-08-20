@@ -44,7 +44,7 @@ Error ABParseFileSpec(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long *hea
     OSErr               err = noErr;
     Error               error;
     short               refNum = 0;
-    ABFileHeaderPtr     abFileHeaderPtr = &abFileSpecPtr->abFileHeader;    
+    ABFileHeaderPtr     abFileHeaderPtr = &abFileSpecPtr->abFileHeader;
     
     /* Open the Data Fork */
     err = HOpenDF(myFSSPtr->vRefNum, myFSSPtr->parID, myFSSPtr->name, fsRdPerm, &refNum);    
@@ -179,6 +179,7 @@ Error ABCreateFile(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long parentD
     /* file.part name */
     myCopyPStr(abFileSpecPtr->abFileHeader.filename, partName);
     myAppendPStr(partName, kABPartExtension);
+    mySafeFilename(partName);
     
     err = HCreate
     (
@@ -295,9 +296,10 @@ Error ABCreateFile(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long parentD
         abFileSpecPtr->abCurrentLen += bytesCopied;
         
         /*
-        myCopyPStr(abFileSpecPtr->abFileHeader.filename, tmpName);จจ
+        myCopyPStr(abFileSpecPtr->abFileHeader.filename, tmpName);
         myAppendPStr(tmpName, "\p.part");
-        err = ABRenameFile(myFSSPtr->vRefNum, parentDirID, abFileSpecPtr->abFileHeader.filename, tmpName);
+        mySafeFilename(tmpName);
+        err = HRename(myFSSPtr->vRefNum, parentDirID, abFileSpecPtr->abFileHeader.filename, tmpName);
         if (err) return ERROR(err);
         */
     }
@@ -331,42 +333,9 @@ Error ABCreateFile(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long parentD
     
     if (abFileSpecPtr->abCurrentLen == abFileSpecPtr->abTotalLen)
     {
-        error = ABRenameFile(myFSSPtr->vRefNum, parentDirID, partName, abFileSpecPtr->abFileHeader.filename);
-        if (error.err) return error;
+        err = HRename(myFSSPtr->vRefNum, parentDirID, partName, abFileSpecPtr->abFileHeader.filename);
+        if (err) return error;
     }
-    
-    return ERROR(err);
-}
-
-Error ABRenameFile(int vRefNum, long dirID, Str255 oldName, Str255 newName)
-{
-    #define         MAX_FILENAME_LEN    31
-    #define         MAX_EXTENSION_LEN   8
-    
-    OSErr           err = noErr;
-    int             i;
-    int             extensionRIndex = 0;
-    
-    /* Truncate filename and add ellipsis if necessary */
-    if (newName[0] > MAX_FILENAME_LEN)
-    {
-        for (i = newName[0] ; i > newName[0] - MAX_EXTENSION_LEN ; --i)
-        {
-            if (newName[i] == '.')
-            {
-                extensionRIndex = newName[0] - i + 1;
-                break;
-            }
-        }
-        
-        while (newName[0] > MAX_FILENAME_LEN) {
-            myDeleteElementFromPStr(newName, newName[0] - extensionRIndex);
-        }
-        
-        newName[newName[0] - extensionRIndex] = 'ษ';
-    }
-    
-    err = HRename(vRefNum, dirID, oldName, newName);
     
     return ERROR(err);
 }

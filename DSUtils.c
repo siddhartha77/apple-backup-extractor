@@ -106,7 +106,7 @@ void GetAppFSSpec(FSSpec *appSpec)
 	err = GetProcessInformation(&curPSN, &info);
 }
 
-/* ¥¥¥ File Routines begin here ¥¥¥ */
+/* Â·Â·Â· File Routines begin here Â·Â·Â· */
 /*
 	This routine is used to force the Finder (as much as is possible) to update
 	information about a newly changed file or folder.  
@@ -158,7 +158,7 @@ Boolean FSpIsBusy(FSSpecPtr theFile)
 	return isBusy;
 }
 
-/*	Is the ÒfileÓ represented by this FSSpec really a folder? */
+/*	Is the "file" represented by this FSSpec really a folder? */
 Boolean	FSpIsFolder (FSSpecPtr theFSSpec) 
 {
 	OSErr	err;
@@ -228,7 +228,7 @@ void AddToFSSpecList(FSSpec *fSpec, FSSpecArrayHandle fileList)
 }
 
 
-/* ¥¥¥ Apple event routines begin here ¥¥¥ */
+/* Â·Â·Â· Apple event routines begin here Â·Â·Â· */
 
 /*
 	This routine will create a targetDesc for sending to self.
@@ -402,6 +402,34 @@ void SendQuitToSelf (void)
 		/* and of course dispose of the quit AEVT itself */
 		err = AEDisposeDesc(&quitAE);
 	}
+}
+
+void mySafeFilename(Str255 s)
+{
+    #define         MAX_FILENAME_LEN    31
+    #define         MAX_EXTENSION_LEN   8
+    
+    int             i;
+    int             extensionRIndex = 0;
+    
+    /* Truncate filename and add ellipsis if necessary */
+    if (s[0] > MAX_FILENAME_LEN)
+    {
+        for (i = s[0] ; i > s[0] - MAX_EXTENSION_LEN ; --i)
+        {
+            if (s[i] == '.')
+            {
+                extensionRIndex = s[0] - i + 1;
+                break;
+            }
+        }
+        
+        while (s[0] > MAX_FILENAME_LEN) {
+            myDeleteElementFromPStr(s, s[0] - extensionRIndex);
+        }
+        
+        s[s[0] - extensionRIndex] = '.';
+    }
 }
 
 Error myCreateError(OSErr err, char *file, long line)

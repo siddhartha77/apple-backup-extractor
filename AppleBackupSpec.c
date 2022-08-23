@@ -173,6 +173,7 @@ Error ABCreateFile(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long parentD
     long                resForkOffset;
     long                bytesCopied;
     long                bytesToCopy;
+    long                outputFileSize = 0;
     Str255              partName;
     Handle              bufferH;
     
@@ -192,6 +193,8 @@ Error ABCreateFile(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long parentD
     
     /* Ignore duplicate filenames as we have multipart files */
     if (err && err != dupFNErr) return ERROR(err);
+    
+    /* TODO: If multipart file then update abFileSpecPtr->abCurrentLen */
     
     bufferH = NewHandle(kABCopyBuffer);    
     HLock(bufferH);
@@ -320,6 +323,8 @@ Error ABCreateFile(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long parentD
     cipbOutputFile.hFileInfo.ioFlMdDat      = abFileSpecPtr->abFileHeader.modified;
     cipbOutputFile.hFileInfo.ioFlBkDat      = abFileSpecPtr->abFileHeader.backupTime;
     cipbOutputFile.hFileInfo.ioFlXFndrInfo  = abFileSpecPtr->abFileHeader.FXInfoRec;
+    
+    outputFileSize = cipbOutputFile.hFileInfo.ioFlLgLen + cipbOutputFile.hFileInfo.ioFlRLgLen;
 
     /* Set the folder's Finder information */
     err = PBSetCatInfoSync(&cipbOutputFile);    	
@@ -331,7 +336,11 @@ Error ABCreateFile(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long parentD
     HUnlock(bufferH);
     DisposeHandle(bufferH);
     
-    if (abFileSpecPtr->abCurrentLen == abFileSpecPtr->abTotalLen)
+    /*
+        Compare to outputFileSize since that would reflect a multipart file
+        whereas abFileSpecPtr->abCurrentLen would only reflect the current file header size
+    */
+    if (abFileSpecPtr->abCurrentLen == abFileSpecPtr->abTotalLen || outputFileSize == abFileSpecPtr->abTotalLen)
     {
         err = HRename(myFSSPtr->vRefNum, parentDirID, partName, abFileSpecPtr->abFileHeader.filename);
         if (err) return error;

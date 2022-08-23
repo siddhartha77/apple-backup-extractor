@@ -194,8 +194,6 @@ Error ABCreateFile(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long parentD
     /* Ignore duplicate filenames as we have multipart files */
     if (err && err != dupFNErr) return ERROR(err);
     
-    /* TODO: If multipart file then update abFileSpecPtr->abCurrentLen */
-    
     bufferH = NewHandle(kABCopyBuffer);    
     HLock(bufferH);
     

@@ -236,8 +236,12 @@ static Error ProcessItem(FSSpecPtr myFSSPtr)
             /* Missing disk file */
         }
         else
-        {   
-            while (headerOffset < kABMaxDiskSize - kABFileHeaderLen)
+        {
+            /* Parse the disk header to update sizeOnDisk */
+            error = ABParseDiskHeader(myFSSPtr, &abDiskHeader);
+	        if (error.err) return error;
+	
+            while (headerOffset < abDiskHeader.sizeOnDisk - kABFileHeaderLen)
             {
                 error = ABParseFileSpec(myFSSPtr, &abFileSpec, &headerOffset);
                 
@@ -252,7 +256,6 @@ static Error ProcessItem(FSSpecPtr myFSSPtr)
                 if (abFileSpec.abFileHeader.dirFlags & kABFlagFolder)
                 {
                     /* Create the folder */
-                    //error = ABCreateDir(myFSSPtr, &abFileSpec, backupRootDirID, &createdDirID);
                     error = ABCreateDirPath
                     (
                         myFSSPtr->vRefNum,

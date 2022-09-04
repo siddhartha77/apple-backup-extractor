@@ -7,7 +7,3 @@ Portions of code were based on DropShell 2.0 by Leonard Rosenthol, Marshall Clow
 Thanks to adespoton and Doug Brown.
 
 -siddhartha
-
-## Version History
-1.0b1 (2022.07)
-    - Initial release

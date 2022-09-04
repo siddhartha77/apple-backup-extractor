@@ -9,7 +9,6 @@
 #define kABFileHeaderLen            0x70
 #define kABFirstFileHeaderOffset    0x600
 #define kABFileHeaderBoundary       0x200
-#define kABMaxDiskSize              0x161800
 #define kABCopyBuffer               0x40000 // 256kb buffer
 #define kABMaxDiskFileMatches       512
 #define kABInvalidVRefNum           0x7fff
@@ -115,5 +114,4 @@ void ABFilePathHToPStr(Handle abFilePathH, StringPtr s);
 Error ABUpdateDirDates(int vRefNum, ABFileSpecPtr abFileSpecPtr, long dirID);
 Error ABCreateDirPath(int vRefNum, long parentDirID, Handle abFilePathH, long pathLen, long *createdDirIDPtr);
 Error ABCreateFile(FSSpecPtr myFSSPtr, ABFileSpecPtr abFileSpecPtr, long parentDirID);
-Error ABRenameFile(int vRefNum, long dirID, Str255 oldName, Str255 newName);
 Error ABGetDiskFiles(FSSpecPtr myFSSPtr, ABDiskHeaderPtr abDeskHeaderPtr, FSSpecArrayHandle myFSSpecArrayH, long *diskFileCount);
